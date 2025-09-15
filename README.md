@@ -15,7 +15,7 @@ EBM_001_SCBASED_CIFAR10/
 │   └── trainer.py
 ├── utils/
 │   └── utils.py
-├── experiment_outputs/
+├── samples/
 │   ├── epoch_60_sampler_fail_noisy.png
 │   ├── denoising_test_fail_black.png
 │   └── denoising_test_fail_stable_noise.png
@@ -59,7 +59,7 @@ The model was trained successfully, and the loss function showed a steady decrea
 After 60 epochs of training, the first attempt at generating samples using Langevin Dynamics was made.
 
 **Result:** The samples were indistinguishable from random noise.
-![Initial Noisy Samples](experiment_outputs/epoch_60_sampler_fail_noisy.png)
+![Initial Noisy Samples](samples/epoch_60_sampler_fail_noisy.png)
 
 **Diagnosis:** The hyperparameters for the Langevin sampler were unstable. The random "noise term" was several orders of magnitude stronger than the model's "score term" (guidance), causing the sampler to perform a random walk.
 
@@ -68,7 +68,7 @@ After 60 epochs of training, the first attempt at generating samples using Lange
 To isolate the model's guidance, the random noise term in the sampler was removed, effectively turning it into a gradient descent process on the energy function.
 
 **Result:** The samples immediately collapsed to a solid black color.
-![Black Samples](experiment_outputs/denoising_test_fail_black.png)
+![Black Samples](samples/denoising_test_fail_black.png)
 
 **Diagnosis:** This proved the model's guidance was having a powerful, systematic effect. However, the step size was catastrophically large, causing the pixel values to "explode" and be clamped to -1 (which corresponds to black).
 
@@ -77,7 +77,7 @@ To isolate the model's guidance, the random noise term in the sampler was remove
 The step size for the gradient descent test was drastically reduced to prevent the explosion.
 
 **Result:** The samples remained as random noise, showing no change from their initial state.
-![Stable Noisy Samples](experiment_outputs/denoising_test_fail_stable_noise.png)
+![Stable Noisy Samples](samples/denoising_test_fail_stable_noise.png)
 
 **Diagnosis:** This was the key insight. When the sampler is stable, the model's guidance is too weak to have any effect. The model learned to minimize its loss but failed to learn a useful representation of the data's true gradient field.
 
